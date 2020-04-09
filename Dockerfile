@@ -23,21 +23,30 @@ COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Setup document root
 RUN mkdir -p /var/www/html
 
+# ensure www-data user exists
+RUN set -x; \
+  addgroup -g 82 -S www-data; \
+  adduser -u 82 -D -S -G www-data www-data && exit 0; exit 1
+# 82 is the standard uid/gid for "www-data" in Alpine
+# http://git.alpinelinux.org/cgit/aports/tree/main/apache2/apache2.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/lighttpd/lighttpd.pre-install?h=v3.3.2
+# http://git.alpinelinux.org/cgit/aports/tree/main/nginx-initscripts/nginx-initscripts.pre-install?h=v3.3.2
+
 # Make sure files/folders needed by the processes are accessable when they run under the nobody user
-RUN chown -R nobody.nobody /var/www/html && \
-  chown -R nobody.nobody /run && \
-  chown -R nobody.nobody /var/lib/nginx && \
-  chown -R nobody.nobody /var/log/nginx
+RUN chown -R www-data.www-data /var/www/html && \
+  chown -R www-data.www-data /run && \
+  chown -R www-data.www-data /var/lib/nginx && \
+  chown -R www-data.www-data /var/log/nginx
 
 # Make the document root a volume
-VOLUME /var/www/html
+#VOLUME /var/www/html
 
 # Switch to use a non-root user from here on
-USER nobody
+USER www-data
 
 # Add application
 WORKDIR /var/www/html
-COPY --chown=nobody src/ /var/www/html/
+COPY --chown=www-data src/ /var/www/html/
 
 # Expose the port nginx is reachable on
 EXPOSE 8080

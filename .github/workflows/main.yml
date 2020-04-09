@@ -35,5 +35,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
         tag_with_sha: true
-        tags: 7.3
-        tags: latest
+        tags: 7.3, latest
